@@ -582,3 +582,17 @@ class ClientV1(_Base):
         '''
 
         return self._get(location, models.JSON, callback=callback)
+
+    def get_subscriptions(self, page_size=None, status=None):
+        '''
+                Get collections that the authenticated user has access to
+                :raises planet.api.exceptions.APIException: On API error.
+                :returns: :py:Class:`planet.api.models.WFS3Collections`
+                '''
+        params = {}
+        if page_size:
+            params['page_size'] = page_size
+        if status:
+            params['status'] = status
+        url = self._url('subscriptions/v1')
+        return self._get(url, models.JSON, params).get_body()

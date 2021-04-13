@@ -779,3 +779,43 @@ def download_order(order_id, dest, quiet, pretty):
 
     items = cl.get_individual_order(order_id).items_iter(limit=None)
     handle_interrupt(dl.shutdown, dl.download, items, [], dest)
+
+
+@cli.group('subscriptions')
+def subscriptions():
+    '''Commands for interacting with the Subscriptions API'''
+    pass
+
+
+@subscriptions.command('list')
+@click.option('--page-size', help="0...10000")
+@click.option('--status', help="'running', 'cancelled', 'preparing', 'pending', 'completed', 'suspended', 'failed'")
+@pretty
+def list_subscriptions(pretty, page_size, status):
+    '''List all subscriptions; optionally filter by status'''
+    cl = clientv1()
+    echo_json_response(cl.get_subscriptions(page_size, status), pretty)
+
+#
+# @subscriptions.command('create')
+# @click.option('name', required=True, help="Name of the request")
+# @click.option('source', required=True, help="A source for the subscription, i.e. catalog")
+# @click.option('tools', help="A list of blocks for processing items obtained from 'source'")
+# @click.option('delivery', required=True, help="'google_cloud_storage', 'amazon_s3', or 'azure_blob_storage'")
+# @pretty()
+# def create_subscription(pretty, **kwargs):
+#     '''Create a Subscription'''
+#     ids_from_search = kwargs.get('ids_from_search')
+#     if ids_from_search is not None:
+#         runner = CliRunner()
+#         resp = runner.invoke(quick_search, ids_from_search).output
+#         try:
+#             id_list = ids_from_search_response(resp)
+#         except ValueError:
+#             raise click.ClickException('ids_from_search, {}'.format(resp))
+#         kwargs['id'] = id_list
+#         del kwargs['ids_from_search']
+#     cl = clientv1()
+#     request = create_subscription_request(**kwargs)
+#     echo_json_response(call_and_wrap(cl.create_subscription, request), pretty)
+
