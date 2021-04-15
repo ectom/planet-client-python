@@ -396,7 +396,7 @@ class ClientV1(_Base):
         '''
         params = {'feedID': feed_id}
         url = self._url('analytics/subscriptions')
-        return self._get(url, models.Subscriptions, params=params).get_body()
+        return self._get(url, models.AnalyticSubscriptions, params=params).get_body()
 
     def get_subscription_info(self, subscription_id):
         '''
@@ -524,6 +524,10 @@ class ClientV1(_Base):
         :raises planet.api.exceptions.APIException: On API error.
         '''
         url = self._url('compute/ops/orders/v2/{}'.format(order_id))
+        response = self._get(url, models.Order)
+        print('RESPONSE ---- ', response)
+        print('RESPONSE BODY ---- ', response.get_body())
+
         return self._get(url, models.Order).get_body()
 
     def cancel_order(self, order_id):
@@ -596,3 +600,26 @@ class ClientV1(_Base):
             params['status'] = status
         url = self._url('subscriptions/v1')
         return self._get(url, models.JSON, params).get_body()
+
+    def get_individual_subscription(self, subscription_id):
+        '''Get subscription request details by Subscription ID.
+
+        :param order_id str: The ID of the Order
+        :returns: :py:Class:`planet.api.models.JSON`
+        :raises planet.api.exceptions.APIException: On API error.
+        '''
+        url = self._url(f'subscriptions/v1/{subscription_id}')
+        return self._get(url, models.JSON).get_body()
+
+    def update_subscription(self, subscription_id):
+        '''Cancel a running order by Order ID.
+
+        :param order_id str: The ID of the Order to cancel
+        :returns: :py:Class:`planet.api.models.Order`
+        :raises planet.api.exceptions.APIException: On API error.
+        '''
+        url = self._url('compute/ops/orders/v2/{}'.format(subscription_id))
+        return self.dispatcher.response(models.Request(url, self.auth,
+                                                       body_type=models.Order,
+                                                       method='PUT')
+                                        ).get_body()

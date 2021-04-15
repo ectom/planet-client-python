@@ -356,54 +356,55 @@ def ids_from_search_response(resp):
     return ','.join(ret)
 
 
-def create_subscription_request(name, source, tools=None, delivery):
-    for opt in ('item_type', 'bundle'):
-        inputvalue = kwargs.get(opt)
-        if len(inputvalue) > 1:
-            raise click.ClickException(
-                'only one value for {} is allowed.'.format(opt))
-
-    item_type = kwargs.get('item_type')[0]
-    bundle = kwargs.get('bundle')[0]
-    ids = kwargs.get('id').split(',')
-    email = kwargs.get('email')
-    config = kwargs.get('cloudconfig')
-    clip = kwargs.get('clip')
-    tools = kwargs.get('tools')
-
-    request = {'name': kwargs.get('name'),
-               'products': [{'item_ids': ids,
-                             'item_type': item_type,
-                             'product_bundle': bundle}
-                            ],
-               'tools': [
-    ],
-        'delivery': {
-    },
-        'notifications': {
-                   'email': email
-    },
-    }
-
-    request["delivery"]["archive_filename"] = "{{name}}_{{order_id}}.zip"
-    request["delivery"]["archive_type"] = "zip"
-    request["delivery"]["single_archive"] = True
-
-    if config:
-        with open(config, 'r') as f:
-            conf = json.load(f)
-            request["delivery"].update(conf)
-
-    # NOTE clip is the only tool that currently can be specified via CLI param.
-    # A full tool chain can be specified via JSON file, so that will overwrite
-    # clip if both are present. TODO add other common tools as params.
-    if clip and not tools:
-        toolchain = [{'clip': {'aoi': json.loads(clip)}}]
-        request['tools'].extend(toolchain)
-
-    if tools:
-        with open(tools, 'r') as f:
-            toolchain = json.load(f)
-            request["tools"].extend(toolchain)
-
-    return request
+# TODO: create based on orders WIP
+# def create_subscription_request(name, source='catalog', tools=None, delivery):
+#     for opt in ('item_type', 'bundle'):
+#         inputvalue = kwargs.get(opt)
+#         if len(inputvalue) > 1:
+#             raise click.ClickException(
+#                 'only one value for {} is allowed.'.format(opt))
+#
+#     item_type = kwargs.get('item_type')[0]
+#     bundle = kwargs.get('bundle')[0]
+#     ids = kwargs.get('id').split(',')
+#     email = kwargs.get('email')
+#     config = kwargs.get('cloudconfig')
+#     clip = kwargs.get('clip')
+#     tools = kwargs.get('tools')
+#
+#     request = {'name': name,
+#                'products': [{'item_ids': ids,
+#                              'item_type': item_type,
+#                              'product_bundle': bundle}
+#                             ],
+#                'tools': [
+#     ],
+#         'delivery': {
+#     },
+#         'notifications': {
+#                    'email': email
+#     },
+#     }
+#
+#     request["delivery"]["archive_filename"] = "{{name}}_{{order_id}}.zip"
+#     request["delivery"]["archive_type"] = "zip"
+#     request["delivery"]["single_archive"] = True
+#
+#     if config:
+#         with open(config, 'r') as f:
+#             conf = json.load(f)
+#             request["delivery"].update(conf)
+#
+#     # NOTE clip is the only tool that currently can be specified via CLI param.
+#     # A full tool chain can be specified via JSON file, so that will overwrite
+#     # clip if both are present. TODO add other common tools as params.
+#     if clip and not tools:
+#         toolchain = [{'clip': {'aoi': json.loads(clip)}}]
+#         request['tools'].extend(toolchain)
+#
+#     if tools:
+#         with open(tools, 'r') as f:
+#             toolchain = json.load(f)
+#             request["tools"].extend(toolchain)
+#
+#     return request

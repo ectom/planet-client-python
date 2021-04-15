@@ -788,25 +788,34 @@ def subscriptions():
 
 
 @subscriptions.command('list')
-@click.option('--page-size', help="0...10000")
-@click.option('--status', help="'running', 'cancelled', 'preparing', 'pending', 'completed', 'suspended', 'failed'")
+@click.option('--page-size')
+@click.option('--status')
 @pretty
-def list_subscriptions(pretty, page_size, status):
+def list_subscriptions(page_size, status, pretty):
     '''List all subscriptions; optionally filter by status'''
     cl = clientv1()
     echo_json_response(cl.get_subscriptions(page_size, status), pretty)
 
 
-@subscriptions.command('create')
-@click.option('name', required=True, help="Name of the request")
-@click.option('source', required=True, help="A source for the subscription, i.e. catalog")
-@click.option('tools', help="A list of blocks for processing items obtained from 'source'")
-@click.option('delivery', required=True, help="'google_cloud_storage', 'amazon_s3', or 'azure_blob_storage'")
+@subscriptions.command('get')
+@click.option('--subscription-id', required=True, type=click.UUID)
 @pretty
-def create_subscription(pretty, name, source, tools, delivery):
-    '''Create a Subscription'''
-#   TODO: get tools from args if exists
+def get_subscription(subscription_id, pretty):
+    '''Get subscription for a given subscription ID'''
     cl = clientv1()
-    request = create_subscription_request(name, source, tools, delivery)
-    echo_json_response(call_and_wrap(cl.create_subscription, request), pretty)
+    echo_json_response(cl.get_individual_subscription(subscription_id), pretty)
 
+
+# TODO: create based on orders WIP
+# @subscriptions.command('create')
+# @click.option('name', required=True, help="Name of the request")
+# @click.option('source', required=True, help="A source for the subscription, i.e. catalog")
+# @click.option('tools', help="A list of blocks for processing items obtained from 'source'")
+# @click.option('delivery', required=True, help="'google_cloud_storage', 'amazon_s3', or 'azure_blob_storage'")
+# @pretty
+# def create_subscription(pretty, name, source, tools, delivery):
+#     '''Create a Subscription'''
+#     cl = clientv1()
+#     request = create_subscription_request(name, source, tools, delivery)
+#     echo_json_response(call_and_wrap(cl.create_subscription, request), pretty)
+#

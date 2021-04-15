@@ -301,7 +301,7 @@ class Feeds(AnalyticsPaged):
     pass
 
 
-class Subscriptions(AnalyticsPaged):
+class AnalyticSubscriptions(AnalyticsPaged):
     pass
 
 
