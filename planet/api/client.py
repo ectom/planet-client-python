@@ -591,7 +591,7 @@ class ClientV1(_Base):
         '''
                 Get collections that the authenticated user has access to
                 :raises planet.api.exceptions.APIException: On API error.
-                :returns: :py:Class:`planet.api.models.WFS3Collections`
+                :returns: :py:Class:`planet.api.models.JSON`
                 '''
         params = {}
         if page_size:
@@ -604,7 +604,7 @@ class ClientV1(_Base):
     def get_individual_subscription(self, subscription_id):
         '''Get subscription request details by Subscription ID.
 
-        :param order_id str: The ID of the Order
+        :param subscription_id str: The ID of the Subscription
         :returns: :py:Class:`planet.api.models.JSON`
         :raises planet.api.exceptions.APIException: On API error.
         '''
@@ -612,14 +612,14 @@ class ClientV1(_Base):
         return self._get(url, models.JSON).get_body()
 
     def update_subscription(self, subscription_id):
-        '''Cancel a running order by Order ID.
+        '''Update an existing subscription by Subscription ID.
 
-        :param order_id str: The ID of the Order to cancel
-        :returns: :py:Class:`planet.api.models.Order`
+        :param subscription_id str: The ID of the Subscription to update
+        :returns: :py:Class:`planet.api.models.JSON`
         :raises planet.api.exceptions.APIException: On API error.
         '''
-        url = self._url('compute/ops/orders/v2/{}'.format(subscription_id))
+        url = self._url(f'subscriptions/v1/{subscription_id}')
         return self.dispatcher.response(models.Request(url, self.auth,
-                                                       body_type=models.Order,
+                                                       body_type=models.JSON,
                                                        method='PUT')
                                         ).get_body()
