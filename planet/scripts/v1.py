@@ -794,7 +794,7 @@ def subscriptions():
 def list_subscriptions(page_size, status, pretty):
     '''List all subscriptions; optionally filter by status'''
     cl = clientv1()
-    echo_json_response(cl.get_subscriptions(page_size, status), pretty)
+    echo_json_response(call_and_wrap(cl.get_subscriptions, page_size, status), pretty)
 
 
 @subscriptions.command('get')
@@ -803,7 +803,29 @@ def list_subscriptions(page_size, status, pretty):
 def get_subscription(subscription_id, pretty):
     '''Get subscription for a given subscription ID'''
     cl = clientv1()
-    echo_json_response(cl.get_individual_subscription(subscription_id), pretty)
+    echo_json_response(call_and_wrap(cl.get_individual_subscription, subscription_id), pretty)
+
+
+@subscriptions.command('update')
+@click.option('--subscription-id', required=True, type=click.UUID)
+@click.option('--name', required=True, help="name of subscription")
+@click.option('--source', required=True, help="catalog")
+@click.option('--tools', help=('Path to toolchain json'),
+              type=click.Path(exists=True, resolve_path=True, readable=True,
+                              allow_dash=False, dir_okay=False,
+                              file_okay=True))
+@click.option('--delivery', required=True, help="'google_cloud_storage', 'amazon_s3', 'azure_blob_storage'")
+@click.option('--cloudconfig', help=('Path to cloud delivery config'),
+              type=click.Path(exists=True, resolve_path=True, readable=True,
+                              allow_dash=False, dir_okay=False,
+                              file_okay=True))
+
+@pretty
+def update_subscription(pretty, **kwargs):
+    '''Update subscription for a given subscription ID'''
+    cl = clientv1()
+    request = create_subscription_request(**kwargs)
+    echo_json_response(cl.update_subscription(request), pretty)
 
 
 # TODO: create based on orders WIP
@@ -819,3 +841,113 @@ def get_subscription(subscription_id, pretty):
 #     request = create_subscription_request(name, source, tools, delivery)
 #     echo_json_response(call_and_wrap(cl.create_subscription, request), pretty)
 #
+
+
+
+
+# {
+#   "_links": {
+#     "_self": "https://api.planet.com/subscriptions/v1/8dfd7607-1ddc-4aeb-930b-0df58b40d34e"
+#   },
+#   "created": "2020-10-23T05:14:35.438641Z",
+#   "delivery": {
+#     "parameters": {
+#       "bucket": "subscriptions_qe",
+#       "credentials": "<REDACTED>"
+#     },
+#     "type": "google_cloud_storage"
+#   },
+#   "id": "8dfd7607-1ddc-4aeb-930b-0df58b40d34e",
+#   "name": "QE Subscription - clip and source AOIs do not intersects",
+#   "source": {
+#     "parameters": {
+#       "asset_types": [
+#         "analytic"
+#       ],
+#       "filter": {
+#         "config": [
+#           {
+#             "config": {
+#               "coordinates": [
+#                 [
+#                   [
+#                     2.10662841796875,
+#                     48.68642750129342
+#                   ],
+#                   [
+#                     2.596893310546875,
+#                     48.68642750129342
+#                   ],
+#                   [
+#                     2.596893310546875,
+#                     48.982920865356135
+#                   ],
+#                   [
+#                     2.10662841796875,
+#                     48.982920865356135
+#                   ],
+#                   [
+#                     2.10662841796875,
+#                     48.68642750129342
+#                   ]
+#                 ]
+#               ],
+#               "type": "Polygon"
+#             },
+#             "field_name": "geometry",
+#             "type": "GeometryFilter"
+#           },
+#           {
+#             "config": {
+#               "gt": "2020-10-23T05:15:33.544854Z",
+#               "lt": "2020-10-23T06:14:33.544854Z"
+#             },
+#             "field_name": "published",
+#             "type": "DateRangeFilter"
+#           }
+#         ],
+#         "type": "AndFilter"
+#       },
+#       "item_types": [
+#         "PSOrthoTile"
+#       ]
+#     },
+#     "type": "catalog"
+#   },
+#   "status": "completed",
+#   "tools": [
+#     {
+#       "parameters": {
+#         "aoi": {
+#           "coordinates": [
+#             [
+#               [
+#                 -122.53738403320312,
+#                 37.6718643732763
+#               ],
+#               [
+#                 -122.35387802124023,
+#                 37.6718643732763
+#               ],
+#               [
+#                 -122.35387802124023,
+#                 37.81046205554295
+#               ],
+#               [
+#                 -122.53738403320312,
+#                 37.81046205554295
+#               ],
+#               [
+#                 -122.53738403320312,
+#                 37.6718643732763
+#               ]
+#             ]
+#           ],
+#           "type": "Polygon"
+#         }
+#       },
+#       "type": "clip"
+#     }
+#   ],
+#   "updated": "2020-10-23T05:14:43.687395Z"
+# }
